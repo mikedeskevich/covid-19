@@ -3,14 +3,44 @@ library(deSolve)
 
 #start: january 21, 2020
 
-seir1 <- function(t, x, parms) {
+LastT<-0
+LastLev<-0
+
+getLDLev <- function(t,x, parms){
+  with(as.list(c(parms,x)), {
+    if (t<t8){
+      LastT<<-0
+      LastLev<<-3
+      
+    }
     
+    ICU <- Ic1 + Ic2 + Ic3 + Ic4
+    LDLev<-ifelse(t>t8 && t>LastT+LDTMin,
+                  ifelse(ICU<ICU0, 0, ifelse(ICU<ICU1, 1, ifelse(ICU<ICU2, 2, ifelse(ICU<ICU3, 3, ifelse(ICU<ICU4, 4, ifelse(ICU<ICU5, 5, ifelse(ICU<ICU6, 6, 7))))))),
+                  LastLev
+    )
+    
+    if (LDLev != LastLev) {
+      LastLev<<-LDLev
+      LastT<<-t
+    }
+    
+    return (LDLev)    
+  })
+}
+
+seir1 <- function(t, x, parms) {
     with(as.list(c(parms, x)), {
+        LDLev<-getLDLev(t,x,parms)
+          
+        SD <- ifelse(LDLev >= 0,
+                     ifelse(LDLev==0,SD0,ifelse(LDLev==1,SD1,ifelse(LDLev==2,SD2,ifelse(LDLev==3,SD3,ifelse(LDLev==4,SD4,ifelse(LDLev==5,SD5,ifelse(LDLev==6,SD6,SD7))))))),
+                     SD)
         
         N <- Cp
         
         # change over time in efficacy of % mag SD among specific age groups
-        ef1 <- ifelse(t<t2, 0, ifelse(t<t3, mag1, ifelse(t<t4, mag2, ifelse(t<t4a, mag3, ifelse(t<t5, mag3a, ifelse(t<t5a, mag4, ifelse(t<t5b, mag4a, ifelse(t<t6,  mag4b, ifelse( t< t7, ef1_1,ifelse(t<t8,  ef1_2, ef1_3))))))))))
+        ef1 <- ifelse(t<t2, 0, ifelse(t<t3, mag1, ifelse(t<t4, mag2, ifelse(t<t4a, mag3, ifelse(t<t5, mag3a, ifelse(t<t5a, mag4, ifelse(t<t5b, mag4a, ifelse(t<t6,  mag4b, ifelse( t< t7, ef1_1,ifelse(t<t8,  ef1_2, SD))))))))))
         #ef2 <- ifelse(t<t2, 0, ifelse(t<t3, mag1, ifelse(t<t4, mag2, ifelse(t<t5, mag3, ifelse(t<t6,  mag4, ifelse(t< t7, ef2_1,ifelse(t<t8,  ef2_2, ef2_3)))))))
         #ef3 <- ifelse(t<t2, 0, ifelse(t<t3, mag1, ifelse(t<t4, mag2, ifelse(t<t5, mag3, ifelse(t<t6,  mag4, ifelse(t< t7, ef3_1,ifelse(t<t8,  ef3_2, ef3_3)))))))
         #ef4 <- ifelse(t<t2, 0, ifelse(t<t3, mag1, ifelse(t<t4, mag2, ifelse(t<t5, mag3, ifelse(t<t6,  mag4, ifelse(t< t7, ef4_1,ifelse(t<t8,  ef4_2, ef4_3)))))))
@@ -85,7 +115,8 @@ seir1 <- function(t, x, parms) {
              Iht2 = Ih2 +Ic2,
              Iht3 = Ih3 +Ic3,
              Iht4 = Ih4 +Ic4,
-             Ict =Ic1 + Ic2 + Ic3 + Ic4)
+             Ict =Ic1 + Ic2 + Ic3 + Ic4,
+             LDLev=LDLev)
     })
 }
 
