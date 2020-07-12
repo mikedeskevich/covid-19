@@ -61,8 +61,8 @@ seir1 <- function(t, x, parms) {
          Et = E+E2+E3)
   })
 }
-setwd('C:/Users/kalli/OneDrive/Desktop/DreSasFiles/')
-scen <- read.csv('./phase 4 model params 0522.csv')
+setwd('C:/repo/covid-19/model/')
+scen <- read.csv('./phase 4 model params 0522 -mike.csv')
 
 n <- as.numeric(nrow(scen)) 
 covid_ts <- list() # empty data frame to hold the time series data
@@ -142,5 +142,5 @@ all$V1 <- NULL
 
 all.scen <- merge(scen, all, by = "scenario")
 
-write.csv(all.scen, './allscenarios_phase4_0522.csv', row.names = F)
+write.csv(all.scen, './allscenarios_phase4_0522 -mike.csv', row.names = F)
 
