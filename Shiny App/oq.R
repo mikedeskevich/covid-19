@@ -1,7 +1,6 @@
 library(deSolve)
-
+library(dplyr)
 setwd('C:/repo/covid-19/Shiny App/')
-
 
 source("models.R")
 
@@ -11,12 +10,50 @@ n2 = 1685869
 n3 = 1902963
 n4 = 738958
 
+#copied from the app's defaults
 sd1in=0.65
 sd2in=0.65
-sd3in=0.65
+sd3in=0.85
 maskin=0.5
 piin=0.4545
 kapin=0
+
+args = commandArgs(trailingOnly=TRUE)
+
+# read in OptDef generated input .csv
+inFile = read.csv(args[1], sep = ",", header = FALSE)
+
+# parse values to their appropriate property and place in list
+for (i in 1:nrow(inFile)) {
+  firstCol = inFile[i, "V1"]
+  paramNameSplit = strsplit(firstCol, "-")
+  paramName = paramNameSplit[[1]][2]
+  varDefVal = inFile[i, "V2"]
+  if (paramName=="icu0"){
+    icu0=as.numeric(varDefVal)
+  }
+  else if (paramName=="icu0"){
+    icu0=as.numeric(varDefVal)
+  }
+  else if (paramName=="icu1"){
+    icu1=as.numeric(varDefVal)
+  }
+  else if (paramName=="icu2"){
+    icu2=as.numeric(varDefVal)
+  }
+  else if (paramName=="icu3"){
+    icu3=as.numeric(varDefVal)
+  }
+  else if (paramName=="icu4"){
+    icu4=as.numeric(varDefVal)
+  }
+  else if (paramName=="icu5"){
+    icu5=as.numeric(varDefVal)
+  }
+  else if (paramName=="icu6"){
+    icu6=as.numeric(varDefVal)
+  }
+}
 
 parms <- c(beta = 0.4793, # transmission rate
            cap = 1800,
@@ -89,13 +126,14 @@ parms <- c(beta = 0.4793, # transmission rate
            pi = piin,
            om = 0.0609, #probability a contact traced individual is infected
            temp_on = 0,
-           ICU0 = 100, ICU1 = 200, ICU2 = 400, ICU3 = 600, ICU4 = 800, ICU5 = 1000, ICU6 = 1500, ICU7 = 1800,
-           SD0 = 0.00, SD1 = 0.20, SD2 = 0.40, SD3 = 0.65, SD4 = 0.70, SD5 = 0.75,  SD6 = 0.85,  SD7 = 1.00,
-           LDTMin=28
+           ICU0 = icu0, ICU1 = icu1, ICU2 = icu2, ICU3 = icu3, ICU4 = icu4, ICU5 = icu5, ICU6 = icu6,
+           SD0 = 0.00, SD1 = 0.10, SD2 = 0.75, SD3 = 0.77, SD4 = 0.85, SD5 = 0.90,  SD6 = 0.95,  SD7 = 1.00,
+           UE0 = 0.10, UE1 = 0.35, UE2 = 0.65, UE3 = 0.70, UE4 = 0.72, UE5 = 0.75,  UE6 = 0.80,  UE7 = 0.95,
+           LDTMin=21
 )
 
 ## Run model for CC, H, and I
-dt      <- seq(0, 1500, 1)
+dt      <- seq(0, 3*365, 1)
 inits      <- c(S1 = n1 - 1, E1 = 0, I1 = 1, II1 = 0, Ih1 = 0, Ic1 = 0, A1 = 0, R1 = 0, Rh1 = 0, Rc1 = 0, D1 = 0,
                 S2 = n2,     E2 = 0, I2 = 0, II2 = 0, Ih2 = 0, Ic2 = 0, A2 = 0, R2 = 0, Rh2 = 0, Rc2 = 0, D2 = 0,
                 S3 = n3,     E3 = 0, I3 = 0, II3 = 0, Ih3 = 0, Ic3 = 0, A3 = 0, R3 = 0, Rh3 = 0, Rc3 = 0, D3 = 0,
@@ -118,26 +156,33 @@ out$date <- as.Date(out$time, format="%m/%d/%Y", origin="01/24/2020")
 
 out <- out %>%
   select(date, dailyInfections, dailyHospitalizations, dailyCriticalCare,
-         cumulativeInfections, cumulativeHospitalizations, cumulativeCriticalCare,LDLev)
+         cumulativeInfections, cumulativeHospitalizations, cumulativeCriticalCare,LDLev,SD,UE)
 
-## Run model for deaths
-initsD      <- c(S1 = n1 - 1, E1 = 0, I1 = 1, II1 = 0, Ih1 = 0, A1 = 0, R1 = 0, Rh1 = 0, Ic = 0, Rc = 0, D = 0,
-                 S2 = n2,     E2 = 0, I2 = 0, II2 = 0, Ih2 = 0, A2 = 0, R2 = 0, Rh2 = 0,
-                 S3 = n3,     E3 = 0, I3 = 0, II3 = 0, Ih3 = 0, A3 = 0, R3 = 0, Rh3 = 0,
-                 S4 = n4,     E4 = 0, I4 = 0, II4 = 0, Ih4 = 0, A4 = 0, R4 = 0, Rh4 = 0)
-N  <- Cp
-outD <- lsoda(initsD, dt, seir1D, parms = parms) %>% as.data.frame()
+# ## Run model for deaths
+# initsD      <- c(S1 = n1 - 1, E1 = 0, I1 = 1, II1 = 0, Ih1 = 0, A1 = 0, R1 = 0, Rh1 = 0, Ic = 0, Rc = 0, D = 0,
+#                  S2 = n2,     E2 = 0, I2 = 0, II2 = 0, Ih2 = 0, A2 = 0, R2 = 0, Rh2 = 0,
+#                  S3 = n3,     E3 = 0, I3 = 0, II3 = 0, Ih3 = 0, A3 = 0, R3 = 0, Rh3 = 0,
+#                  S4 = n4,     E4 = 0, I4 = 0, II4 = 0, Ih4 = 0, A4 = 0, R4 = 0, Rh4 = 0)
+# N  <- Cp
+# outD <- lsoda(initsD, dt, seir1D, parms = parms) %>% as.data.frame()
 
-## Calculate cumulative and daily deaths
-outD$cumulativeDeaths <- round(outD$D, 0)
-outD$dailyDeaths <- c(outD$cumulativeDeaths[1], diff(outD$cumulativeDeaths))
-outD$date <- as.Date(outD$time, format="%m/%d/%Y", origin="01/24/2020")
+# ## Calculate cumulative and daily deaths
+# outD$cumulativeDeaths <- round(outD$D, 0)
+# outD$dailyDeaths <- c(outD$cumulativeDeaths[1], diff(outD$cumulativeDeaths))
+# outD$date <- as.Date(outD$time, format="%m/%d/%Y", origin="01/24/2020")
 
-outD <- outD %>%
-  select(date, cumulativeDeaths, dailyDeaths)
+# outD <- outD %>%
+#   select(date, cumulativeDeaths, dailyDeaths)
 
-## Combine CC, H, I and Deaths outputs to pass to function
-out <- full_join(out, outD, by = "date") 
+# ## Combine CC, H, I and Deaths outputs to pass to function
+# out <- full_join(out, outD, by = "date") 
 
-write.csv(out, 'c:/repo/covid-19/Shiny App/out.csv', row.names = F)
+#write.csv(out, 'c:/repo/covid-19/Shiny App/out.csv', row.names = F)
+
+optdefout=c("output-icu"=sum(out$dailyCriticalCare),
+            "output-ue"=sum(out$UE))
+
+print(optdefout)
+
+write.table(optdefout, args[2], sep=",", col.names=FALSE)
 

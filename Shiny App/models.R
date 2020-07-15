@@ -10,17 +10,28 @@ getLDLev <- function(t,x, parms){
   with(as.list(c(parms,x)), {
     if (t<t8){
       LastT<<-0
-      LastLev<<-3
-      
+      LastLev<<- -1
+      return(-1)
     }
     
     ICU <- Ic1 + Ic2 + Ic3 + Ic4
-    LDLev<-ifelse(t>t8 && t>LastT+LDTMin,
-                  ifelse(ICU<ICU0, 0, ifelse(ICU<ICU1, 1, ifelse(ICU<ICU2, 2, ifelse(ICU<ICU3, 3, ifelse(ICU<ICU4, 4, ifelse(ICU<ICU5, 5, ifelse(ICU<ICU6, 6, 7))))))),
+    LDLev<-ifelse(t>LastT+LDTMin,
+                  ifelse(ICU<ICU0, 0, 
+                  ifelse(ICU<ICU1, 1, 
+                  ifelse(ICU<ICU2, 2, 
+                  ifelse(ICU<ICU3, 3, 
+                  ifelse(ICU<ICU4, 4, 
+                  ifelse(ICU<ICU5, 5, 
+                  ifelse(ICU<ICU6, 6, 7))))))),
                   LastLev
     )
     
-    if (LDLev != LastLev) {
+    if (LDLev < LastLev) {
+      LDDev<-LastLev-1
+    }
+    
+    if (LDLev != LastLev)
+    {
       LastLev<<-LDLev
       LastT<<-t
     }
@@ -30,13 +41,30 @@ getLDLev <- function(t,x, parms){
 }
 
 seir1 <- function(t, x, parms) {
+  #print(sum(x))
     with(as.list(c(parms, x)), {
         LDLev<-getLDLev(t,x,parms)
           
         SD <- ifelse(LDLev >= 0,
-                     ifelse(LDLev==0,SD0,ifelse(LDLev==1,SD1,ifelse(LDLev==2,SD2,ifelse(LDLev==3,SD3,ifelse(LDLev==4,SD4,ifelse(LDLev==5,SD5,ifelse(LDLev==6,SD6,SD7))))))),
-                     SD)
-        
+                     ifelse(LDLev==0,SD0,
+                     ifelse(LDLev==1,SD1,
+                     ifelse(LDLev==2,SD2,
+                     ifelse(LDLev==3,SD3,
+                     ifelse(LDLev==4,SD4,
+                     ifelse(LDLev==5,SD5,
+                     ifelse(LDLev==6,SD6,SD7))))))),
+                     0)
+
+        UE <- ifelse(LDLev >= 0,
+                     ifelse(LDLev==0,UE0,
+                     ifelse(LDLev==1,UE1,
+                     ifelse(LDLev==2,UE2,
+                     ifelse(LDLev==3,UE3,
+                     ifelse(LDLev==4,UE4,
+                     ifelse(LDLev==5,UE5,
+                     ifelse(LDLev==6,UE6,UE7))))))),
+                     0)
+
         N <- Cp
         
         # change over time in efficacy of % mag SD among specific age groups
@@ -116,7 +144,9 @@ seir1 <- function(t, x, parms) {
              Iht3 = Ih3 +Ic3,
              Iht4 = Ih4 +Ic4,
              Ict =Ic1 + Ic2 + Ic3 + Ic4,
-             LDLev=LDLev)
+             LDLev=LDLev,
+             SD=SD,
+             UE=UE)
     })
 }
 

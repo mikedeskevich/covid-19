@@ -1,0 +1,8 @@
+#input_type, input_name (opt), input_attribute, variable_type, default_value, lower_bound (opt), upper_bound (opt), hover_text (opt), enumerated_values (opt)
+param, ,icu0, continuous,100,0,1800,,
+param, ,icu1, continuous,200,0,1800,,
+param,,icu2, continuous,300,0,1800,,
+param,,icu3, continuous,400,0,1800,,
+param,,icu4, continuous,500,0,1800,,
+param,,icu5, continuous,600,0,1800,,
+param,,icu6, continuous,700,0,1800,,
