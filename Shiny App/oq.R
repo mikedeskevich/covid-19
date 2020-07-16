@@ -20,38 +20,39 @@ kapin=0
 
 args = commandArgs(trailingOnly=TRUE)
 
-# read in OptDef generated input .csv
-inFile = read.csv(args[1], sep = ",", header = FALSE)
+if (args[1]=="--direct") {
+  icu0=as.numeric(args[2])
+  icu1=as.numeric(args[3])
+  icu2=as.numeric(args[4])
+  icu3=as.numeric(args[5])
+  icu4=as.numeric(args[6])
+  icu5=as.numeric(args[7])
+  icu6=as.numeric(args[8])
+} else {
+  # read in OptDef generated input .csv
+  inFile = read.csv(args[1], sep = ",", header = FALSE)
 
-# parse values to their appropriate property and place in list
-for (i in 1:nrow(inFile)) {
-  firstCol = inFile[i, "V1"]
-  paramNameSplit = strsplit(firstCol, "-")
-  paramName = paramNameSplit[[1]][2]
-  varDefVal = inFile[i, "V2"]
-  if (paramName=="icu0"){
-    icu0=as.numeric(varDefVal)
-  }
-  else if (paramName=="icu0"){
-    icu0=as.numeric(varDefVal)
-  }
-  else if (paramName=="icu1"){
-    icu1=as.numeric(varDefVal)
-  }
-  else if (paramName=="icu2"){
-    icu2=as.numeric(varDefVal)
-  }
-  else if (paramName=="icu3"){
-    icu3=as.numeric(varDefVal)
-  }
-  else if (paramName=="icu4"){
-    icu4=as.numeric(varDefVal)
-  }
-  else if (paramName=="icu5"){
-    icu5=as.numeric(varDefVal)
-  }
-  else if (paramName=="icu6"){
-    icu6=as.numeric(varDefVal)
+  # parse values to their appropriate property and place in list
+  for (i in 1:nrow(inFile)) {
+    firstCol = inFile[i, "V1"]
+    paramNameSplit = strsplit(firstCol, "-")
+    paramName = paramNameSplit[[1]][2]
+    varDefVal = inFile[i, "V2"]
+    if (paramName=="icu0"){
+      icu0=as.numeric(varDefVal)
+    } else if (paramName=="icu1"){
+      icu1=as.numeric(varDefVal)
+    } else if (paramName=="icu2"){
+      icu2=as.numeric(varDefVal)
+    } else if (paramName=="icu3"){
+      icu3=as.numeric(varDefVal)
+    } else if (paramName=="icu4"){
+      icu4=as.numeric(varDefVal)
+    } else if (paramName=="icu5"){
+      icu5=as.numeric(varDefVal)
+    } else if (paramName=="icu6"){
+      icu6=as.numeric(varDefVal)
+    }
   }
 }
 
@@ -127,8 +128,8 @@ parms <- c(beta = 0.4793, # transmission rate
            om = 0.0609, #probability a contact traced individual is infected
            temp_on = 0,
            ICU0 = icu0, ICU1 = icu1, ICU2 = icu2, ICU3 = icu3, ICU4 = icu4, ICU5 = icu5, ICU6 = icu6,
-           SD0 = 0.00, SD1 = 0.10, SD2 = 0.75, SD3 = 0.77, SD4 = 0.85, SD5 = 0.90,  SD6 = 0.95,  SD7 = 1.00,
-           UE0 = 0.10, UE1 = 0.35, UE2 = 0.65, UE3 = 0.70, UE4 = 0.72, UE5 = 0.75,  UE6 = 0.80,  UE7 = 0.95,
+           SD0 = 0.00, SD1 = 0.35, SD2 = 0.70, SD3 = 0.75, SD4 = 0.85, SD5 = 0.90,  SD6 = 0.95,  SD7 = 1.00,
+           UE0 = 0.00, UE1 = 0.25, UE2 = 0.65, UE3 = 0.70, UE4 = 0.72, UE5 = 0.75,  UE6 = 0.80,  UE7 = 0.95,
            LDTMin=21
 )
 
@@ -177,12 +178,10 @@ out <- out %>%
 # ## Combine CC, H, I and Deaths outputs to pass to function
 # out <- full_join(out, outD, by = "date") 
 
-#write.csv(out, 'c:/repo/covid-19/Shiny App/out.csv', row.names = F)
-
-optdefout=c("output-icu"=sum(out$dailyCriticalCare),
-            "output-ue"=sum(out$UE))
-
-print(optdefout)
-
-write.table(optdefout, args[2], sep=",", col.names=FALSE)
-
+if (args[1]=="--direct") {
+  write.csv(out, 'c:/repo/covid-19/Shiny App/out.csv', row.names = F)
+} else {
+  optdefout=c("output-icu"=sum(out$dailyCriticalCare),
+              "output-ue"=sum(out$UE))
+  write.table(optdefout, args[2], sep=",", col.names=FALSE)
+}
