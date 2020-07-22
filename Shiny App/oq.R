@@ -157,7 +157,7 @@ out$date <- as.Date(out$time, format="%m/%d/%Y", origin="01/24/2020")
 
 out <- out %>%
   select(date, dailyInfections, dailyHospitalizations, dailyCriticalCare,
-         cumulativeInfections, cumulativeHospitalizations, cumulativeCriticalCare,LDLev,SD,UE)
+         cumulativeInfections, cumulativeHospitalizations, cumulativeCriticalCare,LDLev,SD,UE,ICU)
 
 # ## Run model for deaths
 # initsD      <- c(S1 = n1 - 1, E1 = 0, I1 = 1, II1 = 0, Ih1 = 0, A1 = 0, R1 = 0, Rh1 = 0, Ic = 0, Rc = 0, D = 0,
@@ -182,6 +182,7 @@ if (args[1]=="--direct") {
   write.csv(out, 'c:/repo/covid-19/Shiny App/out.csv', row.names = F)
 } else {
   optdefout=c("output-icu"=sum(out$dailyCriticalCare),
-              "output-ue"=sum(out$UE))
+              "output-ue"=sum(out$UE),
+              "output-maxicu"=max(out$ICU))
   write.table(optdefout, args[2], sep=",", col.names=FALSE)
 }

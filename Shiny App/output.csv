@@ -1,7 +1,7 @@
 #output_type, output_name (opt), output_attribute, hover_text (opt)
 output, ,icu,
 output, ,ue,
-, ,,
+output, ,maxicu,
 , ,,
 , ,,
 , ,,

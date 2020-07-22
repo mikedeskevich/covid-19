@@ -135,6 +135,8 @@ seir1 <- function(t, x, parms) {
                  dS3, dE3, dI3, dII3, dIh3, dIc3, dA3, dR3, dRh3, dRc3, dD3,
                  dS4, dE4, dI4, dII4, dIh4, dIc4, dA4, dR4, dRh4, dRc4, dD4)
         
+        ICU <- ifelse(t<t8,0,Ic1 + Ic2 + Ic3 + Ic4)
+
         list(der,
              It = I1 + I2 + I3 + I4,
              IIt = II1 + II2 + II3 + II4,
@@ -146,7 +148,8 @@ seir1 <- function(t, x, parms) {
              Ict =Ic1 + Ic2 + Ic3 + Ic4,
              LDLev=LDLev,
              SD=SD,
-             UE=UE)
+             UE=UE,
+             ICU=ICU)
     })
 }
 
