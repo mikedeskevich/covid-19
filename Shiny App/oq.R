@@ -128,7 +128,7 @@ parms <- c(beta = 0.4793, # transmission rate
            om = 0.0609, #probability a contact traced individual is infected
            temp_on = 0,
            ICU0 = icu0, ICU1 = icu1, ICU2 = icu2, ICU3 = icu3, ICU4 = icu4, ICU5 = icu5, ICU6 = icu6,
-           SD0 = 0.00, SD1 = 0.35, SD2 = 0.70, SD3 = 0.75, SD4 = 0.85, SD5 = 0.90,  SD6 = 0.95,  SD7 = 1.00,
+           SD0 = 0.00, SD1 = 0.35, SD2 = 0.50, SD3 = 0.55, SD4 = 0.60, SD5 = 0.65,  SD6 = 0.70,  SD7 = 1.00,
            UE0 = 0.00, UE1 = 0.25, UE2 = 0.65, UE3 = 0.70, UE4 = 0.72, UE5 = 0.75,  UE6 = 0.80,  UE7 = 0.95,
            LDTMin=21
 )
@@ -182,6 +182,7 @@ if (args[1]=="--direct") {
   write.csv(out, 'c:/repo/covid-19/Shiny App/out.csv', row.names = F)
 } else {
   optdefout=c("output-icu"=sum(out$dailyCriticalCare),
+              "output-hosp"=sum(out$dailyHospitalizations),
               "output-ue"=sum(out$UE),
               "output-maxicu"=max(out$ICU))
   write.table(optdefout, args[2], sep=",", col.names=FALSE)

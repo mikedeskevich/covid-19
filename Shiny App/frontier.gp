@@ -129,7 +129,7 @@ set x2label ""
 set x2label  font "" textcolor lt -1 norotate
 set xrange [ 0.00000 : * ] noreverse writeback
 set x2range [ 56389.0 : 410985. ] noreverse writeback
-set ylabel "ICU Beds In Use" 
+set ylabel "Average Daily Hospital Admissions" 
 set ylabel  font "" textcolor lt -1 rotate
 set y2label "" 
 set y2label  font "" textcolor lt -1 rotate
@@ -170,5 +170,5 @@ x = 0.0
 ## Last datafile plotted: "frontier.csv"
 set style fill transparent solid 0.10 noborder
 set style circle radius 2.5
-plot 'infeasible.csv' u 3:2 w circles  lc 'red', 'all.csv' u 3:2 w circles lc 'black','frontier.csv' u 3:2 w l s mcs lc 'blue' lw 5
+plot 'infeasible.csv' u 3:($2/891.0) w circles  lc 'red', 'all.csv' u 3:($2/891.0) w circles lc 'black','frontier.csv' u 3:($2/891.0) w l s mcs lc 'blue' lw 5
 #    EOF

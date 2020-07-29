@@ -14,7 +14,8 @@ getLDLev <- function(t,x, parms){
       return(-1)
     }
     
-    ICU <- Ic1 + Ic2 + Ic3 + Ic4
+    #ICU <- Ic1 + Ic2 + Ic3 + Ic4
+    ICU <- Ih1 + Ih2 + Ih3 + Ih4
     LDLev<-ifelse(t>LastT+LDTMin,
                   ifelse(ICU<ICU0, 0, 
                   ifelse(ICU<ICU1, 1, 
@@ -136,6 +137,7 @@ seir1 <- function(t, x, parms) {
                  dS4, dE4, dI4, dII4, dIh4, dIc4, dA4, dR4, dRh4, dRc4, dD4)
         
         ICU <- ifelse(t<t8,0,Ic1 + Ic2 + Ic3 + Ic4)
+        HOSP <- ifelse(t<t8,0,Ih1 + Ih2 + Ih3 + Ih4)
 
         list(der,
              It = I1 + I2 + I3 + I4,
@@ -149,7 +151,8 @@ seir1 <- function(t, x, parms) {
              LDLev=LDLev,
              SD=SD,
              UE=UE,
-             ICU=ICU)
+             ICU=ICU,
+             HOSP=HOSP)
     })
 }
 
